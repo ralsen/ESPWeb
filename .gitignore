@@ -2,4 +2,6 @@
 .git
 *.zip
 *.lnk
+log
+data
 __pycache__
