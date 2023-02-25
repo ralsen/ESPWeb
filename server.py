@@ -101,7 +101,7 @@ class Devices():
         self.devlist[MyName]["info"] = data
         self.devlist[MyName]["stat"] = {
            "tout": 10,
-            "cnt": 0
+            "cnt": 1
         }
         self.Service(MyName)
     
@@ -111,6 +111,7 @@ class Devices():
     def update(self, data):
         self.devlist[data['name']]['stat']['tout'] = 10
         self.devlist[data['name']]['info'] = data
+        self.devlist[data['name']]['stat']['cnt'] += 1    
 
     class Service():
         MyName = ''
@@ -123,7 +124,6 @@ class Devices():
             while True:
                 if Devices.devlist[self.MyName]['stat']['tout']:
                     Devices.devlist[self.MyName]['stat']['tout'] -= 1
-                Devices.devlist[self.MyName]['stat']['cnt'] += 1    
                 time.sleep(1)
 
 def update(data):
