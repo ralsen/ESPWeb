@@ -1,0 +1,5 @@
+.vscode
+.git
+*.zip
+*.lnk
+__pycache__
