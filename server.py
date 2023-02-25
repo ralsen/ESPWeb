@@ -5,7 +5,7 @@ import ast
 import time
 import threading
 
-hostName = "172.26.145.233"
+hostName = "192.168.1.53"
 serverPort = 8080
 
 class webserverHandler(BaseHTTPRequestHandler):

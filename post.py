@@ -4,7 +4,7 @@ import requests
 import time
 import socket
 
-BASE_URL = 'http://172.26.145.233:8080'
+BASE_URL = 'http://192.168.1.53:8080'
 '''
 {'name': 'secondary000e8e93adb2', 'IP: ': '127.0.1.1', 'Disk usage [%]: ': 5.7, 'EDAG Busv. [V]: ': 92.5, 'charging: ': 1, 'System uptime [s]: ': 21511, 'App uptime [s]: ': 4174}
 {'name': 'secondary000e8eaa31d6', 'IP: ': '192.168.2.26', 'Disk usage [%]: ': 6.1, 'EDAG Busv. [V]: ': 0, 'charging: ': 0, 'System uptime [s]: ': 21513, 'App uptime [s]: ': 2623}
