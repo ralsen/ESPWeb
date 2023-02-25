@@ -1,3 +1,5 @@
+#\\testpi\root\mnt\samba\Daten\Projekte\ESPWeb\server.py
+
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import cgi
 import sys
@@ -5,7 +7,6 @@ import ast
 import time
 import datetime
 import threading
-
 
 hostName = "192.168.1.53"
 serverPort = 8080
