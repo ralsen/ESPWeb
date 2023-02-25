@@ -3,6 +3,7 @@ import cgi
 import sys
 import ast
 import time
+import datetime
 import threading
 
 hostName = "192.168.1.53"
@@ -36,7 +37,7 @@ class webserverHandler(BaseHTTPRequestHandler):
                         <body \
                         bgcolor="#d0d0d0" text="#434343" link="#1a1a1a" alink="#1a1a1a" vlink="#1a1a1a"> \
                         <center> \
-                        <h2> Hello, this is the LaneCharge Webserver</h2></form> \
+                        <h2> Hello, this is the ESPNode Webserver</h2></form> \
                         </center> \
                         <center> \
                         {TABLE} \
@@ -97,11 +98,12 @@ class Devices():
     def addDevice(self, data):
         MyName = data['name']
         self.devlist[MyName] = {}
-        self.devlist[MyName]["info"] = {}
-        self.devlist[MyName]["info"] = data
-        self.devlist[MyName]["stat"] = {
+        self.devlist[MyName]['info'] = {}
+        self.devlist[MyName]['info'] = data
+        self.devlist[MyName]['stat'] = {
            "tout": 10,
-            "cnt": 1
+            "cnt": 1,
+            "time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
         self.Service(MyName)
     
@@ -110,8 +112,9 @@ class Devices():
 
     def update(self, data):
         self.devlist[data['name']]['stat']['tout'] = 10
-        self.devlist[data['name']]['info'] = data
         self.devlist[data['name']]['stat']['cnt'] += 1    
+        self.devlist[data['name']]['stat']['time'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.devlist[data['name']]['info'] = data
 
     class Service():
         MyName = ''
