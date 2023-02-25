@@ -13,7 +13,7 @@ value = {}
 def init():
     global  value
 
-    with open("./yml/config.yml", "r") as ymlfile:
+    with open("../yml/config.yml", "r") as ymlfile:
         ymlcfg = yaml.safe_load(ymlfile)
     value["logSuffix"] = ymlcfg["suffixes"]["log"]
     value["dataSuffix"] = ymlcfg["suffixes"]["data"]
