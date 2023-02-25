@@ -7,6 +7,8 @@ import ast
 import time
 import datetime
 import threading
+import logging 
+import config as cfg
 
 hostName = "192.168.1.53"
 serverPort = 8080
@@ -105,10 +107,11 @@ class Devices():
         self.devlist[MyName]['stat'] = {
            "tout": 10,
             "cnt": 1,
-            "time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            "time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            'service': self.Service(self.devlist[MyName])
         }
-        self.Service(MyName)
-    
+        self.devlist[MyName]['stat']['service'].MyThread.start()
+
     def getList(self):
         return self.devlist
 
@@ -117,19 +120,26 @@ class Devices():
         self.devlist[data['name']]['stat']['cnt'] += 1    
         self.devlist[data['name']]['stat']['time'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self.devlist[data['name']]['info'] = data
+        self.devlist[data['name']]['stat']['service'].Supdate(data)
+
 
     class Service():
         MyName = ''
+        MyThread = ''
         def __init__ (self, name):
-            self.MyName = name
-            threading.Thread(target=self._monitoring_thread, daemon=True).start()
+            self.MyList = name
+            self.MyThread = threading.Thread(target=self._monitoring_thread, daemon=True)
 
         def _monitoring_thread(self):
         #        logger.info("DataStare monitoring started")
             while True:
-                if Devices.devlist[self.MyName]['stat']['tout']:
-                    Devices.devlist[self.MyName]['stat']['tout'] -= 1
+                if self.MyList['stat']['tout']:
+                    self.MyList['stat']['tout'] -= 1
                 time.sleep(1)
+        
+        def Supdate(self, data):
+            #print('---> ', self.MyList)
+            pass
 
 def update(data):
     try:
@@ -149,6 +159,8 @@ def _monitoring_thread():
 devs = Devices()
 
 def main():
+    cfg.init()
+    logging.info("---------- starting ESPWeb - server ----------") 
     try:
         server = HTTPServer((hostName, serverPort), webserverHandler)
         print("Server started http://%s:%s" % (hostName, serverPort))
