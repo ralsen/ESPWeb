@@ -114,8 +114,10 @@ class Devices():
         return self.devlist
 
     def update(self, data):
-        #print(data)
-        #ds.handle_DataSet(data)
+        dataset = {}
+        dataset[data['name']] = {}
+        dataset[data['name']] = data
+        #ds.handle_DataSet(dataset)
         try:
             self.devlist[data['name']]['stat']['service'].Supdate(data)
         except Exception as err:
