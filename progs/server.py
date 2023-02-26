@@ -9,9 +9,7 @@ import datetime
 import threading
 import logging 
 import config as cfg
-
-hostName = "192.168.1.53"
-serverPort = 8080
+import DataStore as ds
 
 class webserverHandler(BaseHTTPRequestHandler):
     """docstring for webserverHandler"""
@@ -94,7 +92,7 @@ class webserverHandler(BaseHTTPRequestHandler):
         except:
             self.send_error(404, "{}".format(sys.exc_info()[0]))
             print(sys.exc_info())
-        update(data)
+        devs.update(data)
 
 class Devices():
     devlist = {}
@@ -105,9 +103,9 @@ class Devices():
         self.devlist[MyName]['info'] = {}
         self.devlist[MyName]['info'] = data
         self.devlist[MyName]['stat'] = {
-           "tout": 10,
-            "cnt": 1,
-            "time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            'tout': 10,
+            'cnt': 1,
+            'time': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             'service': self.Service(self.devlist[MyName])
         }
         self.devlist[MyName]['stat']['service'].MyThread.start()
@@ -116,18 +114,19 @@ class Devices():
         return self.devlist
 
     def update(self, data):
-        self.devlist[data['name']]['stat']['tout'] = 10
-        self.devlist[data['name']]['stat']['cnt'] += 1    
-        self.devlist[data['name']]['stat']['time'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        self.devlist[data['name']]['info'] = data
-        self.devlist[data['name']]['stat']['service'].Supdate(data)
+        #print(data)
+        #ds.handle_DataSet(data)
+        try:
+            self.devlist[data['name']]['stat']['service'].Supdate(data)
+        except Exception as err:
+            logging.info(f"new device: {err} -> generating")
+            print (f"new device: {err} -> generating")
+            self.addDevice(data)
 
 
     class Service():
-        MyName = ''
-        MyThread = ''
-        def __init__ (self, name):
-            self.MyList = name
+        def __init__ (self, list):
+            self.MyList = list
             self.MyThread = threading.Thread(target=self._monitoring_thread, daemon=True)
 
         def _monitoring_thread(self):
@@ -138,32 +137,23 @@ class Devices():
                 time.sleep(1)
         
         def Supdate(self, data):
-            #print('---> ', self.MyList)
-            pass
-
-def update(data):
-    try:
-        devs.update(data)
-    except Exception as err:
-        print (f"unknown device: {err} -> generating")
-        print("generating: ", err)
-        devs.addDevice(data)
-
-def _monitoring_thread():
-#        logger.info("DataStare monitoring started")
-    while True:
-        #print(".")
-        time.sleep(1)
-
+            self.MyList['stat']['tout'] = 10
+            self.MyList['stat']['cnt'] += 1    
+            self.MyList['stat']['time'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            self.MyList['info'] = data
 
 devs = Devices()
 
 def main():
     cfg.init()
     logging.info("---------- starting ESPWeb - server ----------") 
+    ServerName = cfg.ymlcfg['Communication']['ServerName']
+    ServerPort = cfg.ymlcfg['Communication']['ServerPort']
+    
     try:
-        server = HTTPServer((hostName, serverPort), webserverHandler)
-        print("Server started http://%s:%s" % (hostName, serverPort))
+        server = HTTPServer((ServerName, ServerPort), webserverHandler)
+        print("Server started on http://%s:%s" % (ServerName, ServerPort))
+        logging.info("Server started on http://%s:%s" % (ServerName, ServerPort))
         server.serve_forever()
 
     except KeyboardInterrupt:
