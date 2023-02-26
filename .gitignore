@@ -4,4 +4,5 @@
 *.lnk
 log
 data
+rrd
 __pycache__
