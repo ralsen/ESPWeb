@@ -305,7 +305,10 @@ def put(Store, *args):
     handle_DataSet(data)
 
 def handle_DataSet(DataSet):
-    DS.ds[list(DataSet.keys())[0]]["Commons"]["Service"].handle_DataSet(DataSet)
+    try:
+        DS.ds[list(DataSet.keys())[0]]["Commons"]["Service"].handle_DataSet(DataSet)
+    except:
+        print ('unknown Datastore')
   
 def handle_CAN(StoreName, DataSet):
     DS.ds[StoreName]["Commons"]["Service"].handle_CAN(DataSet)
