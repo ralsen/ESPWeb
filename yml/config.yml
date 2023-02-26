@@ -12,6 +12,10 @@ pathes:
     PROG: "prog/"
     HTML: "html/"
     IPAdr: "IPAdr"
+
+Communication:
+    ServerName: '192.168.1.53'    
+    ServerPort: 8080
     
 files:
     LOG: "ServESP.log"
