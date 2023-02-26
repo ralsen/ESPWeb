@@ -1,38 +1,38 @@
 
 
 pathes:
-    ROOT_PATH: "../"
-    DATA: "data/"                 # not used yet
-    LOG: "log/"
-    RRD: "rrd/"
-    YML: "yml/"
-    PIC: "pic/"
-    ARCH: "archiv/"
-    SCENE: "Scenes/"
-    PROG: "prog/"
-    HTML: "html/"
-    IPAdr: "IPAdr"
+    ROOT_PATH: '/mnt/samba/Daten/Projekte/ESPWeb/'
+    DATA: 'data/'                 # not used yet
+    LOG: 'log/'
+    RRD: 'rrd/'
+    YML: 'yml/'
+    PIC: 'pic/'
+    ARCH: 'archiv/'
+    SCENE: 'Scenes/'
+    PROG: 'prog/'
+    HTML: 'html/'
+    IPAdr: 'IPAdr'
 
 Communication:
     ServerName: '192.168.1.53'    
     ServerPort: 8080
     
 files:
-    LOG: "ServESP.log"
-    DATASTORE_YML: "datastore.yml"
+    LOG: 'ServESP.log'
+    DATASTORE_YML: 'datastore.yml'
 
 suffixes:
-    log: # "-%Y_%m_%d__%H-%M-%S"     #date and time
-         "-%Y_%m_%d"                #date only
-         #""                         # hostname only
-    data: "-%Y_%m_%d__%H-%M-%S"     #date and time
-          #"-%Y_%m_%d"               #date only
-          #""                        #without date and time
+    log: # '-%Y_%m_%d__%H-%M-%S'     #date and time
+         '-%Y_%m_%d'                #date only
+         #''                         # hostname only
+    data: '-%Y_%m_%d__%H-%M-%S'     #date and time
+          #'-%Y_%m_%d'               #date only
+          #''                        #without date and time
 
 debug:
-    datefmt: "%d.%m.%Y %H:%M:%S"      # normal
-    #datefmt: "%d.%m.%Y %H:%M:%S.%s"   # fine (with ms)
-    hirestime: True                    # time resolution in data logs (true=ms, false=s)
+    datefmt: '%d.%m.%Y %H:%M:%S'      # normal
+    #datefmt: '%d.%m.%Y %H:%M:%S.%s'   # fine (with ms)
+    hirestime: False                    # time resolution in data logs (true=ms, false=s)
     logYML: True                      #put the yml-file into the log
     verbose: True
 
