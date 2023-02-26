@@ -23,8 +23,8 @@ class DS():
 
     def append(self, Store, template):
         template = self.Stores["DataStores"][template]
-        print("Building Store for: ", Store)
-        logger.info("Building Store for: " + Store)
+        print(f'Building Store for: {Store}')
+        logger.info(f'Building Store for: {Store}')
         self.ds[Store] = dict()
         for ShelfTag, x in template.items():
             self.ds[Store][ShelfTag] = dict()
@@ -61,8 +61,8 @@ class Service():
                 DS.ds[self.MyName]["Commons"]["TIMEOUT"] -= 1
                 if(not DS.ds[self.MyName]["Commons"]["TIMEOUT"]):
                     DS.ds[self.MyName]["Commons"]["Active"] = False
-                    logger.error("Message missed: " + self.MyName)
-                    print("Message missed: ", self.MyName )
+                    logger.error(f'Message missed: {self.MyName}')
+                    print(f'Message missed: {self.MyName}')
             time.sleep(1)
 
     def handle_DataSet(self, DataSet):
@@ -75,14 +75,14 @@ class Service():
             try:
                 self.handleData(DataSet[key], timeStamp)
             except Exception as err:
-                logger.error("receiving invalid DataSet: " + key, " - ", type(err))
-                print("receiving invalid DataSet: ", key, " - ", type(err))
+                logger.error(f'receiving invalid DataSet: {key} - {type(err)}')
+                print(f'receiving invalid DataSet: {key} - {type(err)}')
 
     def handle_CAN(self, msg):
       try:
           decoded_DBC = config.CAN_dbc.decode_message(msg.arbitration_id, msg.data)
       except:
-          logger.error("receiving unknown CAN-Bus message-ID: " + str(msg.arbitration_id))
+          logger.error(f'receiving unknown CAN-Bus message-ID: {str(msg.arbitration_id)}')
           return
       if config.hirestime:
           timeStamp = str(msg.timestamp)
@@ -92,8 +92,8 @@ class Service():
 
     def handleData(self, DataSet, timeStamp):
         if DS.ds[self.MyName]["Commons"]["TIMEOUT"] == 0 and DS.ds[self.MyName]["Commons"]["RELOAD_TIMEOUT"] != 0:
-            logger.info("Message send resume: " + self.MyName)
-            print("Message send resume: " + self.MyName)
+            logger.info(f'Message send resume: {self.MyName}')
+            print(f'Message send resume: {self.MyName}')
         DS.ds[self.MyName]["Commons"]["Active"] = True
         DS.ds[self.MyName]["Commons"]["TIMEOUT"] = DS.ds[self.MyName]["Commons"]["RELOAD_TIMEOUT"]
         
@@ -145,7 +145,7 @@ class Service():
         try:
             DS.ds[self.MyName][DataShelf]["CURRENT_DATA"] = DataBoxValue
         except Exception as err:
-            logger.error(type(err).__name__ + " in: "  + self.MyName + " - " + DataShelf)
+            logger.error(f'{type(err).__name__} in: {self.MyName} - {DataShelf}')
             return None
 
         try: # values can be omitted in the *.signals.yml
@@ -234,8 +234,8 @@ class Service():
         try:
             self.doRRD()
         except Exception as err:    
-            logger.error("fehlr in RRD-Verarbeitung: " + type(err).__name__ + " in: "  + self.MyName)
-            print("fehlr in RRD-Verarbeitung: " + type(err).__name__ + " in: "  + self.MyName)
+            logger.error(f'fehlr in RRD-Verarbeitung: {type(err).__name__} in: {self.MyName}')
+            print(f'fehlr in RRD-Verarbeitung: {type(err).__name__} in: {self.MyName}')
 
     def doRRD(self):
         try:
@@ -252,7 +252,7 @@ class Service():
                 if DBInfo[block][line][0] == "OUTFILE":
                     rrdfile = cfg.RRDPath + str(res) + ".rrd"
                 else: rrdstr += ":" + str(res)
-            print(rrdfile, " - ", rrdstr, end="\r\n\r\n")
+            #print(rrdfile, " - ", rrdstr, end="\r\n\r\n")
             rrdtool.update(rrdfile, rrdstr)
         return    
 
@@ -268,13 +268,13 @@ class Service():
             value = DBStr[2]
         elif DBStr[1][0] == "§":
             value = DS.ds[store][DBStr[1][1:]][DBStr[2]]
-        else: print("FEHELR")
+        else: print('FEHELR')
         if DBStr[0] == "INFILE":
             try:
                 with open(cfg.DataPath + value, "r") as file:
                     value = file.read()
             except:
-                print("File not found: ", cfg.DataPath + value)
+                print(f'File not found: {cfg.DataPath}{value}')
         # print("getRRDValue (store): ", store, " - ", value)
         return value
 
@@ -308,7 +308,8 @@ def handle_DataSet(DataSet):
     try:
         DS.ds[list(DataSet.keys())[0]]["Commons"]["Service"].handle_DataSet(DataSet)
     except:
-        print ('unknown Datastore')
+        logger.info(f'unknown Datastore: {DataSet.keys()}')
+        print (f'unknown Datastore: {DataSet.keys()}')
   
 def handle_CAN(StoreName, DataSet):
     DS.ds[StoreName]["Commons"]["Service"].handle_CAN(DataSet)
