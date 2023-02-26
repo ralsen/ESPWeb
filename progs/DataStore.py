@@ -67,7 +67,7 @@ class Service():
 
     def handle_DataSet(self, DataSet):
         
-        if cfg.value["hirestime"]:
+        if cfg.hirestime:
             timeStamp = str(time.time())
         else:
             timeStamp = str(int(time.time()))
@@ -250,7 +250,7 @@ class Service():
                 res = self.getRRDValue(DBInfo[block][line])
                 # print("--->: ", res)
                 if DBInfo[block][line][0] == "OUTFILE":
-                    rrdfile = cfg.value["RRDPath"] + str(res) + ".rrd"
+                    rrdfile = cfg.RRDPath + str(res) + ".rrd"
                 else: rrdstr += ":" + str(res)
             print(rrdfile, " - ", rrdstr, end="\r\n\r\n")
             rrdtool.update(rrdfile, rrdstr)
@@ -271,19 +271,19 @@ class Service():
         else: print("FEHELR")
         if DBStr[0] == "INFILE":
             try:
-                with open(cfg.value["DataPath"] + value, "r") as file:
+                with open(cfg.DataPath + value, "r") as file:
                     value = file.read()
             except:
-                print("File not found: ", cfg.value["DataPath"] + value)
+                print("File not found: ", cfg.DataPath + value)
         # print("getRRDValue (store): ", store, " - ", value)
         return value
 
     def writeDataSet(self, Shelf, line): 
         if DS.ds[self.MyName]["Commons"]["FORMAT"] == "SINGLE_CSV":
-            FileName = cfg.value["DataPath"] + self.MyName + "_" + Shelf + "_" + DS.ds[self.MyName][Shelf]["STORE_MODE"] + DS.ds[self.MyName]["Commons"]["initTime"].strftime(cfg.value["dataSuffix"]) + ".txt"
+            FileName = cfg.DataPath + self.MyName + "_" + Shelf + "_" + DS.ds[self.MyName][Shelf]["STORE_MODE"] + DS.ds[self.MyName]["Commons"]["initTime"].strftime(cfg.dataSuffix) + ".txt"
             DS.ds[self.MyName]["Commons"]["header"] = "time," + Shelf
         if DS.ds[self.MyName]["Commons"]["FORMAT"] == "MULTI_CSV":
-            FileName = cfg.value["DataPath"] + self.MyName + DS.ds[self.MyName]["Commons"]["initTime"].strftime(cfg.value["dataSuffix"]) + ".txt"
+            FileName = cfg.DataPath + self.MyName + DS.ds[self.MyName]["Commons"]["initTime"].strftime(cfg.dataSuffix) + ".txt"
         try:
             with open(FileName, 'r') as DataFile: 
                 pass
