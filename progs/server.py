@@ -12,7 +12,7 @@ import config as cfg
 import DataStore as ds
 
 class webserverHandler(BaseHTTPRequestHandler):
-    """docstring for webserverHandler"""
+    '''docstring for webserverHandler'''
 
     def do_GET(self):
         try:
@@ -108,21 +108,21 @@ class Devices():
             'time': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             'service': self.Service(self.devlist[MyName])
         }
+        dataset = {}
+        dataset[data['name']] = {}
+        dataset[data['name']] = data
+        ds.handle_DataSet(dataset)
         self.devlist[MyName]['stat']['service'].MyThread.start()
 
     def getList(self):
         return self.devlist
 
     def update(self, data):
-        dataset = {}
-        dataset[data['name']] = {}
-        dataset[data['name']] = data
-        #ds.handle_DataSet(dataset)
         try:
             self.devlist[data['name']]['stat']['service'].Supdate(data)
         except Exception as err:
-            logging.info(f"new device: {err} -> generating")
-            print (f"new device: {err} -> generating")
+            logging.info(f'new device: {err} -> generating')
+            print (f'new device: {err} -> generating')
             self.addDevice(data)
 
 
@@ -132,7 +132,7 @@ class Devices():
             self.MyThread = threading.Thread(target=self._monitoring_thread, daemon=True)
 
         def _monitoring_thread(self):
-        #        logger.info("DataStare monitoring started")
+        #        logger.info('DataStare monitoring started')
             while True:
                 if self.MyList['stat']['tout']:
                     self.MyList['stat']['tout'] -= 1
@@ -141,25 +141,31 @@ class Devices():
         def Supdate(self, data):
             self.MyList['stat']['tout'] = 10
             self.MyList['stat']['cnt'] += 1    
-            self.MyList['stat']['time'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            self.MyList['stat']['time'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             self.MyList['info'] = data
+            dataset = {}
+            dataset[data['name']] = {}
+            dataset[data['name']] = data
+            ds.handle_DataSet(dataset)
+
+
 
 devs = Devices()
 
 def main():
     cfg.init()
-    logging.info("---------- starting ESPWeb - server ----------") 
-    ServerName = cfg.ymlcfg['Communication']['ServerName']
-    ServerPort = cfg.ymlcfg['Communication']['ServerPort']
+    logging.info('---------- starting ESPWeb - server ----------') 
+    ServerName = cfg.yml['Communication']['ServerName']
+    ServerPort = cfg.yml['Communication']['ServerPort']
     
     try:
         server = HTTPServer((ServerName, ServerPort), webserverHandler)
-        print("Server started on http://%s:%s" % (ServerName, ServerPort))
-        logging.info("Server started on http://%s:%s" % (ServerName, ServerPort))
+        print('Server started on http://%s:%s' % (ServerName, ServerPort))
+        logging.info('Server started on http://%s:%s' % (ServerName, ServerPort))
         server.serve_forever()
 
     except KeyboardInterrupt:
-        print(" ^C entered stopping web server...")
+        print(' ^C entered stopping web server...')
         server.socket.close()
 
 
