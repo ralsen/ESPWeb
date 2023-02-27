@@ -74,7 +74,7 @@
 #   StoreName: DataStore template
 generate_stores:
     ESP:
-        Jan_8C_CE_4E_DE_B2_F0: with_RRD_and_CONF_2
+        Jan_CC_50_E3_5D_A7_A5: with_RRD_and_CONF_2
         No-Name_8C_CE_4E_DE_B2_F0: with_RRD_and_CONF
         Schnell_AC_0B_FB_D6_41_74: with_RRD_and_CONF
 #            - [[with_RRD_and_CONF],
