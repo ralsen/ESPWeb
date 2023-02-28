@@ -9,7 +9,7 @@ import socket
 import datetime
 
 def init():
-    global yml
+    global yml, Dstore
     global DataPath, RRDPath, dataSuffix, hirestime
 
     with open('../yml/config.yml', 'r') as ymlfile:
