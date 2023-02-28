@@ -11,9 +11,9 @@ import logging
 import config as cfg
 import DataStore as ds
 
-class webserverHandler(BaseHTTPRequestHandler):
-    '''docstring for webserverHandler'''
+logger = logging.getLogger(__name__)
 
+class webserverHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         try:
             if self.path.endswith("/"):
@@ -39,7 +39,7 @@ class webserverHandler(BaseHTTPRequestHandler):
                         <body \
                         bgcolor="#d0d0d0" text="#434343" link="#1a1a1a" alink="#1a1a1a" vlink="#1a1a1a"> \
                         <center> \
-                        <h2> Hello, this is the ESPNode Webserver</h2></form> \
+                        <h2> Hello, this is the LaneCharge Webserver</h2></form> \
                         </center> \
                         <center> \
                         {TABLE} \
@@ -57,7 +57,7 @@ class webserverHandler(BaseHTTPRequestHandler):
                             } \
                         </style> \
                         <table>'
-                devices = devs.getList()
+                devices = devs.getDeviceList()
                 for dev in devices.keys():
                     table += '<tr>'
                     for ident, value in devices[dev].items():
@@ -93,58 +93,66 @@ class webserverHandler(BaseHTTPRequestHandler):
             self.send_error(404, "{}".format(sys.exc_info()[0]))
             print(sys.exc_info())
         devs.update(data)
+        print(cfg.yml['devices'])
 
 class Devices():
     devlist = {}
     
     def addDevice(self, data):
-        MyName = data['name']
-        self.devlist[MyName] = {}
-        self.devlist[MyName]['info'] = {}
-        self.devlist[MyName]['info'] = data
-        self.devlist[MyName]['stat'] = {
-            'tout': 10,
+        self.MyName = data['name']
+        self.devlist[self.MyName] = {}
+        self.devlist[self.MyName]['info'] = {}
+        self.devlist[self.MyName]['info'] = data
+        self.devlist[self.MyName]['stat'] = {
+            'online': True,
             'cnt': 1,
             'time': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            'service': self.Service(self.devlist[MyName])
         }
+        self.devlist[self.MyName]['__services__'] = {
+            'service': self.Service(self.devlist[self.MyName])
+        }
+        #cfg.Dstore.append(self.MyName, 'with_RRD_and_CONF')
         dataset = {}
-        dataset[data['name']] = {}
         dataset[data['name']] = data
         ds.handle_DataSet(dataset)
-        self.devlist[MyName]['stat']['service'].MyThread.start()
+        self.devlist[self.MyName]['__services__']['service'].MyThread.start()
 
-    def getList(self):
-        return self.devlist
-
+    def getDeviceList(self):
+        liste = {}
+        for key in self.devlist.keys():
+            liste[key] = {}
+            liste[key]['info'] = self.devlist[key]['info']
+            liste[key]['stat'] = self.devlist[key]['stat']
+        return dict(sorted(liste.items(), key=lambda item: item[0]))
+        #return liste
     def update(self, data):
         try:
-            self.devlist[data['name']]['stat']['service'].Supdate(data)
+            self.devlist[data['name']]['__services__']['service'].Supdate(data)
         except Exception as err:
-            logging.info(f'new device: {err} -> generating')
+            logger.info(f'new device: {err} -> generating')
             print (f'new device: {err} -> generating')
             self.addDevice(data)
 
 
     class Service():
         def __init__ (self, list):
+            logger.info('Device Service started')
             self.MyList = list
+            self.MyName = list['info']['name']
             self.MyThread = threading.Thread(target=self._monitoring_thread, daemon=True)
 
         def _monitoring_thread(self):
-        #        logger.info('DataStare monitoring started')
+            logger.info('Device monitoring started')
             while True:
-                if self.MyList['stat']['tout']:
-                    self.MyList['stat']['tout'] -= 1
+                self.MyList['stat']['online'] = ds.pick(self.MyName, 'Commons', 'Active')
                 time.sleep(1)
         
         def Supdate(self, data):
-            self.MyList['stat']['tout'] = 10
+            self.MyList['stat']['online'] = True
             self.MyList['stat']['cnt'] += 1    
             self.MyList['stat']['time'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             self.MyList['info'] = data
             dataset = {}
-            dataset[data['name']] = {}
             dataset[data['name']] = data
             ds.handle_DataSet(dataset)
 
@@ -154,14 +162,14 @@ devs = Devices()
 
 def main():
     cfg.init()
-    logging.info('---------- starting ESPWeb - server ----------') 
+    logger.info('---------- starting ESPWeb - server ----------') 
     ServerName = cfg.yml['Communication']['ServerName']
     ServerPort = cfg.yml['Communication']['ServerPort']
     
     try:
         server = HTTPServer((ServerName, ServerPort), webserverHandler)
         print('Server started on http://%s:%s' % (ServerName, ServerPort))
-        logging.info('Server started on http://%s:%s' % (ServerName, ServerPort))
+        logger.info('Server started on http://%s:%s' % (ServerName, ServerPort))
         server.serve_forever()
 
     except KeyboardInterrupt:
@@ -171,4 +179,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
